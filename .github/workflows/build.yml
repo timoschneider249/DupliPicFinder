@@ -84,7 +84,6 @@ jobs:
         with:
           files: |
             ./dist/main
-            ./dist/main.exe
           draft: false
           prerelease: false
           tag_name: v${{ env.VERSION }}
