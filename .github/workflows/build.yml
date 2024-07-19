@@ -30,20 +30,20 @@ jobs:
       - name: Build executable
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-           pyinstaller --onefile src/main.py
+            pyinstaller --onefile src/main.py
           else
-           pyinstaller --onefile src/main.py
+            pyinstaller --onefile src/main.py
           fi
         shell: bash
 
-      - name: Archive executable
+      - name: Archive Linux executable
         if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v2
         with:
           name: executable-linux
           path: dist/main
 
-      - name: Archive executable
+      - name: Archive Windows executable
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v2
         with:
@@ -66,12 +66,14 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Download Linux executable
+        if: always()
         uses: actions/download-artifact@v2
         with:
           name: executable-linux
           path: ./dist
 
       - name: Download Windows executable
+        if: always()
         uses: actions/download-artifact@v2
         with:
           name: executable-windows
@@ -89,6 +91,7 @@ jobs:
           prerelease: false
 
       - name: Upload Linux executable to Release
+        if: always()
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -97,6 +100,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload Windows executable to Release
+        if: always()
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
