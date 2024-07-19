@@ -30,9 +30,9 @@ jobs:
       - name: Build executable
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            pyinstaller --onefile src/main.py
+            pyinstaller --onefile --name DupliPicFinder src/main.py
           else
-            pyinstaller --onefile src/main.py
+            pyinstaller --onefile --name DupliPicFinder src/main.py
           fi
         shell: bash
 
@@ -41,14 +41,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: executable-linux
-          path: dist/main
+          path: dist/DupliPicFinder
 
       - name: Archive Windows executable
         if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: executable-windows
-          path: dist/main
+          path: dist/DupliPicFinder.exe
 
   release:
     name: Create Release
@@ -83,10 +83,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./dist/main
+            ./dist/DupliPicFinder
+            ./dist/DupliPicFinder.exe
           draft: false
           prerelease: false
           tag_name: v${{ env.VERSION }}
           name: DupliPicFinder v${{ env.VERSION }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
