@@ -6,12 +6,9 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build executables
+  build-linux:
+    name: Build Linux executable
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout code
@@ -29,22 +26,37 @@ jobs:
 
       - name: Build executable
         run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            pyinstaller --onefile --name DupliPicFinder src/main.py
-          else
-            pyinstaller --onefile --name DupliPicFinder.exe src/main.py --target-arch x86_64
-          fi
-        shell: bash
+          pyinstaller --onefile --name DupliPicFinder src/main.py
 
       - name: Archive Linux executable
-        if: matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: executable-linux
           path: dist/DupliPicFinder
 
+  build-windows:
+    name: Build Windows executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --name DupliPicFinder.exe src/main.py --target-arch x86_64
+
       - name: Archive Windows executable
-        if: matrix.os == 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: executable-windows
@@ -52,7 +64,7 @@ jobs:
 
   release:
     name: Create Release
-    needs: build
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
 
     steps:
@@ -66,14 +78,12 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Download Linux executable
-        if: always()
         uses: actions/download-artifact@v4
         with:
           name: executable-linux
           path: ./dist
 
       - name: Download Windows executable
-        if: always()
         uses: actions/download-artifact@v4
         with:
           name: executable-windows
