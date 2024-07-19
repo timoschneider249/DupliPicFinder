@@ -1,9 +1,10 @@
+# .github/workflows/windows-build.yml
 name: Build and Release Windows Executable
 
 on:
   push:
-    tags:
-      - 'v*.*.*'  # Trigger on version tag push
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -17,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -41,12 +42,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Get version from setup.py
+        id: get_version
+        run: |
+          version=$(python -c "import setuptools; print(setuptools.__version__)")
+          echo "VERSION=${version}" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           draft: false
           prerelease: false
         env:
