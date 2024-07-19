@@ -30,9 +30,10 @@ jobs:
       - name: Build executable
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            pyinstaller --onefile main.py
+           pyinstaller --onefile main.py
           else
-            pyinstaller --onefile main.py
+           pyinstaller --onefile main.py
+          fi
         shell: bash
 
       - name: Archive executable
