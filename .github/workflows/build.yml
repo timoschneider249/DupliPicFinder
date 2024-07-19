@@ -56,7 +56,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --name DupliPicFinder.exe src/main.py --target-arch x86_64
+          pyinstaller --onefile --noconsole --name DupliPicFinder.exe src/main.py --target-arch x86_64
 
       - name: Archive Windows executable
         uses: actions/upload-artifact@v4
