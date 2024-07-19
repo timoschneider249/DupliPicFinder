@@ -31,10 +31,8 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             pyinstaller --onefile --name DupliPicFinder src/main.py
-            ls -la dist  # List files in the dist directory for debugging
           else
             pyinstaller --onefile --name DupliPicFinder.exe src/main.py
-            ls -la dist  # List files in the dist directory for debugging
           fi
         shell: bash
 
@@ -92,4 +90,4 @@ jobs:
           tag_name: v${{ env.VERSION }}
           name: DupliPicFinder v${{ env.VERSION }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
