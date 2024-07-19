@@ -88,6 +88,6 @@ jobs:
           draft: false
           prerelease: false
           tag_name: v${{ env.VERSION }}
-          release_name: DupliPicFinder v${{ env.VERSION }}
+          name: DupliPicFinder v${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
