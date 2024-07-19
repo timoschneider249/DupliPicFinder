@@ -15,12 +15,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -38,17 +38,17 @@ jobs:
 
       - name: Archive Linux executable
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: executable-linux
           path: dist/main
 
       - name: Archive Windows executable
         if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: executable-windows
-          path: dist/main.exe
+          path: dist/main
 
   release:
     name: Create Release
@@ -57,7 +57,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Parse version from setup.py
         id: get_version
@@ -67,43 +67,26 @@ jobs:
 
       - name: Download Linux executable
         if: always()
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: executable-linux
           path: ./dist
 
       - name: Download Windows executable
         if: always()
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: executable-windows
           path: ./dist
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release v${{ env.VERSION }}
+          files: |
+            ./dist/main
+            ./dist/main.exe
           draft: false
           prerelease: false
-
-      - name: Upload Linux executable to Release
-        if: always()
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/main
-          asset_name: main_linux
-          asset_content_type: application/octet-stream
-
-      - name: Upload Windows executable to Release
-        if: always()
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/main.exe
-          asset_name: main_windows.exe
-          asset_content_type: application/octet-stream
