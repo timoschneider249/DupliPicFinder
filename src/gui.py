@@ -129,7 +129,7 @@ def select_folder():
     thread.start()
 
 def show_about():
-    messagebox.showinfo("About", "Dupli Pic Finder v0.2.0")
+    messagebox.showinfo("About", "Dupli Pic Finder v0.3.0")
 
 def show_help():
     top = tk.Toplevel(root)
