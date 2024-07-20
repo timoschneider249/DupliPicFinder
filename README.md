@@ -62,4 +62,4 @@ Click the "Select Folder" button to choose the directory you want to scan for du
 After scanning, the application will list the duplicate images found. You will be prompted to confirm if you want to delete the duplicates. If you agree, the second occurrence of each duplicate image will be deleted.
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/timoschneider249/DupliPicFinder/blob/main/LICENSE) file for details.
