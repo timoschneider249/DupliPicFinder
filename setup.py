@@ -10,7 +10,7 @@ setup(
     install_requires=[
         'imagehash==4.3.1',
         'Pillow==10.4.0',
-        'tksheet==7.2.12',
+        'customtkinter==5.2.2',
     ],
     extras_require={
         'dev': [
