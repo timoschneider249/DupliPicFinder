@@ -1,0 +1,4 @@
+pagination:
+  items_per_page: 101
+system:
+  image_tolerance: 52

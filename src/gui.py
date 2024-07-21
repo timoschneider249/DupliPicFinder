@@ -120,7 +120,7 @@ def select_folder():
 
 
 def show_about():
-    messagebox.showinfo("About", "Dupli Pic Finder v0.3.1")
+    messagebox.showinfo("About", "Dupli Pic Finder v0.4.0")
 
 
 def show_help():
@@ -140,36 +140,7 @@ def show_help():
 
 
 def open_preferences():
-    pref_window = tk.Toplevel(root)
-    pref_window.title("Preferences")
-    pref_frame = ctk.CTkFrame(pref_window)
-    pref_frame.pack(padx=10, pady=10)
-
-    tolerance_label = ctk.CTkLabel(pref_frame, text="Tolerance Level:")
-    tolerance_label.grid(row=0, column=0, pady=5, sticky='w')
-    tolerance_entry = ctk.CTkEntry(pref_frame)
-    tolerance_entry.grid(row=0, column=1, pady=5, sticky='w')
-    tolerance_entry.insert(0, str(preferences_manager.tolerance))
-
-    items_label = ctk.CTkLabel(pref_frame, text="Items Per Page:")
-    items_label.grid(row=1, column=0, pady=5, sticky='w')
-    items_entry = ctk.CTkEntry(pref_frame)
-    items_entry.grid(row=1, column=1, pady=5, sticky='w')
-    items_entry.insert(0, str(preferences_manager.items_per_page))
-
-    def save_preferences_and_close():
-        try:
-            preferences_manager.tolerance = int(tolerance_entry.get())
-            preferences_manager.items_per_page = int(items_entry.get())
-            preferences_manager.save_preferences()
-            pref_window.destroy()
-            update_pagination()
-            root.after(0, load_page, current_page)  # Schedule on main thread
-        except ValueError:
-            messagebox.showerror("Invalid Input", "Please enter valid integers for tolerance and items per page.")
-
-    save_button = ctk.CTkButton(pref_frame, text="Save", command=save_preferences_and_close)
-    save_button.grid(row=2, column=0, columnspan=2, pady=10)
+    preferences_manager.open_preferences(root, update_pagination, load_page, current_page)
 
 
 # Main window setup

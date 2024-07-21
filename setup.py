@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='DupliPicFinder',
-    version='0.3.1',
+    version='0.4.0',
     description='A tool to find and manage duplicate images using perceptual hashing.',
     author='Timo Schneider',
     url='https://github.com/timoschneider249/DupliPicFinder',
@@ -11,6 +11,7 @@ setup(
         'imagehash==4.3.1',
         'Pillow==10.4.0',
         'customtkinter==5.2.2',
+        'PyYAML==6.0.1',
     ],
     extras_require={
         'dev': [
