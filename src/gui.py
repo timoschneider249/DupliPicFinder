@@ -6,6 +6,7 @@ import os
 import threading
 
 from src.main import find_duplicates
+from src.preferences import PreferencesManager
 
 # Global variables
 current_page = 0
@@ -14,27 +15,6 @@ total_items = 0
 unique_duplicates = []
 tolerance = 5  # Default tolerance level
 
-# Load and save preferences
-def load_preferences():
-    global items_per_page, tolerance
-    try:
-        with open("preferences.txt", "r") as f:
-            lines = f.readlines()
-            tolerance = int(lines[0].strip()) if len(lines) > 0 else 5
-            items_per_page = int(lines[1].strip()) if len(lines) > 1 else 20
-    except (FileNotFoundError, IndexError, ValueError):
-        tolerance = 5
-        items_per_page = 20
-
-def save_preferences():
-    global items_per_page, tolerance
-    try:
-        with open("preferences.txt", "w") as f:
-            f.write(f"{tolerance}\n")
-            f.write(f"{items_per_page}\n")
-    except Exception as e:
-        messagebox.showerror("Error", f"Failed to save preferences: {e}")
-
 # Callback function
 def on_find_duplicates_complete(duplicates):
     global unique_duplicates, total_items
@@ -42,6 +22,7 @@ def on_find_duplicates_complete(duplicates):
     total_items = len(unique_duplicates)
     update_pagination()
     load_page(current_page)
+
 
 def load_page(page_number):
     start_index = page_number * items_per_page
@@ -70,11 +51,13 @@ def load_page(page_number):
     # Update the layout
     result_frame.update_idletasks()
 
+
 def update_pagination():
     global current_page
     page_label.configure(text=f"Page {current_page + 1} of {-(total_items // -items_per_page)}")
     prev_button.configure(state=tk.NORMAL if current_page > 0 else tk.DISABLED)
     next_button.configure(state=tk.NORMAL if current_page < (total_items - 1) // items_per_page else tk.DISABLED)
+
 
 def next_page():
     global current_page
@@ -83,6 +66,7 @@ def next_page():
         root.after(0, load_page, current_page)  # Schedule on main thread
         update_pagination()
 
+
 def prev_page():
     global current_page
     if current_page > 0:
@@ -90,16 +74,19 @@ def prev_page():
         root.after(0, load_page, current_page)  # Schedule on main thread
         update_pagination()
 
+
 def update_progress(current, total, progress):
     progress_bar.set(progress)
     progress_label.configure(text=f"{current}/{total} images")
     root.update_idletasks()
+
 
 def delete_image(image_path):
     if messagebox.askyesno("Delete Image", f"Are you sure you want to delete {image_path}?"):
         os.remove(image_path)
         messagebox.showinfo("Deleted", f"Deleted {image_path}")
         select_folder()
+
 
 def view_image(image_path):
     top = tk.Toplevel(root)
@@ -109,6 +96,7 @@ def view_image(image_path):
     label = tk.Label(top, image=img)
     label.image = img
     label.pack()
+
 
 def select_folder():
     folder_path = filedialog.askdirectory()
@@ -125,11 +113,14 @@ def select_folder():
     progress_label.configure(text="Processing...")
     root.update_idletasks()
 
-    thread = threading.Thread(target=find_duplicates, args=(folder_path, tolerance, update_progress, on_find_duplicates_complete))
+    thread = threading.Thread(target=find_duplicates,
+                              args=(folder_path, tolerance, update_progress, on_find_duplicates_complete))
     thread.start()
+
 
 def show_about():
     messagebox.showinfo("About", "Dupli Pic Finder v0.3.0")
+
 
 def show_help():
     top = tk.Toplevel(root)
@@ -145,6 +136,7 @@ def show_help():
     scrollbar = ctk.CTkScrollbar(top, command=help_text_area.yview)
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
     help_text_area.configure(yscrollcommand=scrollbar.set)
+
 
 def open_preferences():
     pref_window = tk.Toplevel(root)
@@ -169,7 +161,7 @@ def open_preferences():
         try:
             tolerance = int(tolerance_entry.get())
             items_per_page = int(items_entry.get())
-            save_preferences()
+            preferences_manager.save_preferences()
             pref_window.destroy()
             update_pagination()
             root.after(0, load_page, current_page)  # Schedule on main thread
@@ -178,6 +170,7 @@ def open_preferences():
 
     save_button = ctk.CTkButton(pref_frame, text="Save", command=save_preferences_and_close)
     save_button.grid(row=2, column=0, columnspan=2, pady=10)
+
 
 # Main window setup
 root = ctk.CTk()
@@ -229,7 +222,8 @@ page_label.pack(side=tk.LEFT, padx=5)
 next_button = ctk.CTkButton(pagination_frame, text="Next", command=next_page)
 next_button.pack(side=tk.LEFT, padx=5)
 
-load_preferences()
+preferences_manager = PreferencesManager()
+preferences_manager.load_preferences()
 
 root.grid_rowconfigure(3, weight=1)
 root.grid_columnconfigure(0, weight=1)
