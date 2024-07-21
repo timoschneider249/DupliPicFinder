@@ -10,12 +10,11 @@ from src.preferences import PreferencesManager
 
 # Global variables
 current_page = 0
-items_per_page = 20
 total_items = 0
 unique_duplicates = []
-tolerance = 5  # Default tolerance level
+preferences_manager = PreferencesManager()
 
-# Callback function
+
 def on_find_duplicates_complete(duplicates):
     global unique_duplicates, total_items
     unique_duplicates = list(set(tuple(sorted(dup)) for dup in duplicates))
@@ -25,8 +24,8 @@ def on_find_duplicates_complete(duplicates):
 
 
 def load_page(page_number):
-    start_index = page_number * items_per_page
-    end_index = min(start_index + items_per_page, total_items)
+    start_index = page_number * preferences_manager.items_per_page
+    end_index = min(start_index + preferences_manager.items_per_page, total_items)
 
     # Clear previous content
     for widget in result_frame.winfo_children():
@@ -54,14 +53,15 @@ def load_page(page_number):
 
 def update_pagination():
     global current_page
-    page_label.configure(text=f"Page {current_page + 1} of {-(total_items // -items_per_page)}")
+    page_label.configure(text=f"Page {current_page + 1} of {-(total_items // -preferences_manager.items_per_page)}")
     prev_button.configure(state=tk.NORMAL if current_page > 0 else tk.DISABLED)
-    next_button.configure(state=tk.NORMAL if current_page < (total_items - 1) // items_per_page else tk.DISABLED)
+    next_button.configure(
+        state=tk.NORMAL if current_page < (total_items - 1) // preferences_manager.items_per_page else tk.DISABLED)
 
 
 def next_page():
     global current_page
-    if current_page < (total_items - 1) // items_per_page:
+    if current_page < (total_items - 1) // preferences_manager.items_per_page:
         current_page += 1
         root.after(0, load_page, current_page)  # Schedule on main thread
         update_pagination()
@@ -102,7 +102,8 @@ def select_folder():
     folder_path = filedialog.askdirectory()
     if not folder_path:
         return
-    global tolerance
+
+    tolerance = preferences_manager.tolerance
     try:
         tolerance = int(tolerance)
     except ValueError:
@@ -119,7 +120,7 @@ def select_folder():
 
 
 def show_about():
-    messagebox.showinfo("About", "Dupli Pic Finder v0.3.0")
+    messagebox.showinfo("About", "Dupli Pic Finder v0.3.1")
 
 
 def show_help():
@@ -148,19 +149,18 @@ def open_preferences():
     tolerance_label.grid(row=0, column=0, pady=5, sticky='w')
     tolerance_entry = ctk.CTkEntry(pref_frame)
     tolerance_entry.grid(row=0, column=1, pady=5, sticky='w')
-    tolerance_entry.insert(0, str(tolerance))
+    tolerance_entry.insert(0, str(preferences_manager.tolerance))
 
     items_label = ctk.CTkLabel(pref_frame, text="Items Per Page:")
     items_label.grid(row=1, column=0, pady=5, sticky='w')
     items_entry = ctk.CTkEntry(pref_frame)
     items_entry.grid(row=1, column=1, pady=5, sticky='w')
-    items_entry.insert(0, str(items_per_page))
+    items_entry.insert(0, str(preferences_manager.items_per_page))
 
     def save_preferences_and_close():
-        global items_per_page, tolerance
         try:
-            tolerance = int(tolerance_entry.get())
-            items_per_page = int(items_entry.get())
+            preferences_manager.tolerance = int(tolerance_entry.get())
+            preferences_manager.items_per_page = int(items_entry.get())
             preferences_manager.save_preferences()
             pref_window.destroy()
             update_pagination()
@@ -222,7 +222,6 @@ page_label.pack(side=tk.LEFT, padx=5)
 next_button = ctk.CTkButton(pagination_frame, text="Next", command=next_page)
 next_button.pack(side=tk.LEFT, padx=5)
 
-preferences_manager = PreferencesManager()
 preferences_manager.load_preferences()
 
 root.grid_rowconfigure(3, weight=1)
