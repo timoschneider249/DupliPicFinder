@@ -27,13 +27,19 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --name DupliPicFinder src/main.py
+          pyinstaller --onedir --name DupliPicFinder src/main.py
 
-      - name: Archive Linux executable
+      - name: Rename and Zip Linux executable
+        run: |
+          cd dist
+          mv DupliPicFinder DupliPicFinder-linux
+          zip -r DupliPicFinder-linux.zip DupliPicFinder-linux
+
+      - name: Archive Linux executable zip
         uses: actions/upload-artifact@v4
         with:
           name: executable-linux
-          path: dist/DupliPicFinder
+          path: dist/DupliPicFinder-linux.zip
 
   build-windows:
     name: Build Windows executable
@@ -56,13 +62,18 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --noconsole --name DupliPicFinder.exe src/main.py --target-arch x86_64 --clean
+          pyinstaller --onedir --noconsole --name DupliPicFinder src/main.py --target-arch x86_64 --clean
 
-      - name: Archive Windows executable
+      - name: Rename and Zip Windows executable
+        run: |
+          powershell Rename-Item -Path dist\DupliPicFinder -NewName DupliPicFinder-windows-x64
+          powershell Compress-Archive -Path dist\DupliPicFinder-windows-x64 -DestinationPath dist\DupliPicFinder-windows-x64.zip
+
+      - name: Archive Windows executable zip
         uses: actions/upload-artifact@v4
         with:
           name: executable-windows
-          path: dist/DupliPicFinder.exe
+          path: dist/DupliPicFinder-windows-x64.zip
 
   release:
     name: Create Release
@@ -79,13 +90,13 @@ jobs:
           VERSION=$(python setup.py --version)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Download Linux executable
+      - name: Download Linux executable zip
         uses: actions/download-artifact@v4
         with:
           name: executable-linux
           path: ./dist
 
-      - name: Download Windows executable
+      - name: Download Windows executable zip
         uses: actions/download-artifact@v4
         with:
           name: executable-windows
@@ -95,8 +106,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./dist/DupliPicFinder
-            ./dist/DupliPicFinder.exe
+            ./dist/DupliPicFinder-linux.zip
+            ./dist/DupliPicFinder-windows-x64.zip
           draft: false
           prerelease: false
           tag_name: v${{ env.VERSION }}
