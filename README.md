@@ -41,7 +41,7 @@ pip install pillow imagehash tkinter multiprocessing
 
 **4. Run the Application**
 ````shell
-python main.py
+python image_utils.py
 ````
 
 ## Requirements

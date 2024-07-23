@@ -1,4 +1,4 @@
 pagination:
-  items_per_page: 101
+  items_per_page: 40
 system:
-  image_tolerance: 52
+  image_tolerance: 5

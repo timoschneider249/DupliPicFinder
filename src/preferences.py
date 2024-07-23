@@ -4,6 +4,7 @@ import tkinter as tk
 import customtkinter as ctk
 from tkinter import messagebox
 
+
 class PreferencesManager:
     def __init__(self, filename="preferences.yaml"):
         self.filename = filename

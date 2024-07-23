@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -46,7 +46,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -56,7 +56,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --noconsole --name DupliPicFinder.exe src/main.py --target-arch x86_64
+          pyinstaller --onefile --noconsole --name DupliPicFinder.exe src/main.py --target-arch x86_64 --clean
 
       - name: Archive Windows executable
         uses: actions/upload-artifact@v4
